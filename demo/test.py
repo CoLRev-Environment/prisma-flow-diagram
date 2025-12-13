@@ -1,0 +1,3 @@
+from py_prisma import plot_prisma_from_records
+
+plot_prisma_from_records()

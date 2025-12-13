@@ -1,5 +1,5 @@
 [project]
-name = "py-prisma"
+name = "py-prisma-flow-chart"
 version = "0.1.0"
 description = "A Python package to create PRISMA flow charts"
 license = {text = "MIT"}
@@ -12,7 +12,7 @@ requires-python = ">=3.8, <4"
 repository = "https://github.com/CoLRev-Environment/colrev/tree/main/colrev/packages/py-prisma"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["src/py_prisma"]
 
 [tool.colrev]
 colrev_doc_description = "Py-PRISMA"
@@ -20,7 +20,7 @@ colrev_doc_link = "README.md"
 search_types = []
 
 [project.entry-points.colrev]
-data = "colrev.packages.py-prisma.src.py_prisma:PRISMA"
+data = "colrev.packages.py_prisma.py_prisma:PRISMA"
 
 [build-system]
 requires = ["hatchling"]
