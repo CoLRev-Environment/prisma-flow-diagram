@@ -1,56 +1,32 @@
 # PRISMA-Py: A Python Package for PRISMA 2020 Flow Charts
 
 This packages creates PRISMA 2020--style flow diagrams using matplotlib.
-You provide counts for each step of your screening process, and it generates a two-column diagram with arrows and phase labels.
+You provide counts for each step of your screening process, and it generates a PRISMA 2020 flow chart.
 
 It supports:
 
-- **New reviews** (standard PRISMA 2020)
+- **New reviews** (standard PRISMA 2020 flow chrat)
 - **Updated reviews** (previous + new studies)
-- **Optional extensions**:
-  - Other search methods (additional lane)
-  - Automation-based exclusions
-  - Detailed exclusion-reason breakdowns
+- **Other search methods** (optional extension)
 
 You can either:
+
 - pass structured counts programmatically, or
 - **derive counts automatically from a CoLRev `records.bib` file**.
 
 The design goal is a **small, transparent interface** with sensible defaults and layout that adapts to your data.
 
-<!--
-## Features
-
-- PRISMA 2020–compliant layout
-- Dynamic box height (based on text length)
-- Dynamic column width (based on longest line)
-- Automatic alignment across lanes
-- Optional updated-review layout
-- Optional CLI for CoLRev workflows
-- Output to PNG, SVG, PDF, …
--->
+Output formats: PNG (other formats coming soon).
 
 ## Installation
 
-The only required dependency is `matplotlib`.
-
 ```bash
-pip install matplotlib
+pip install py-prisma
 ```
 
-Clone or copy the package (e.g., as `py_prisma/`) into your Python path, or install it in editable mode.
+## Quick Start
 
-## Public API Overview
-
-```python
-from py_prisma import (
-    PrismaStatus,
-    load_status_from_records,
-    plot_prisma2020,
-)
-```
-
-## Quick Start (New Review)
+### New Review
 
 ```python
 from py_prisma import plot_prisma2020
@@ -75,25 +51,23 @@ plot_prisma2020(
 )
 ```
 
+### Updated review
+
+TODO
+
+### Other search methods
+
+TODO
+
 ## Working with CoLRev Records
 
 ```python
-from py_prisma import load_status_from_records, plot_prisma2020
+from py_prisma import plot_prisma_from_records
 
-params = load_status_from_records("data/records.bib")
-
-plot_prisma2020(
-    **params.__dict__,
-    filename="prisma_from_records.png",
-)
-```
-
-## Command-Line Interface
-
-```bash
-prisma-from-records data/records.bib prisma.png
+plot_prisma_from_records(filename="prisma_from_records.png")
 ```
 
 ## License
 
-Free to use, modify, and integrate into academic or applied workflows.
+This project is distributed under the [MIT License](LICENSE).
+If you contribute to the project, you agree to share your contribution following this licenses.

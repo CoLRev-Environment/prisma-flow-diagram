@@ -3,11 +3,6 @@ from py_prisma import plot_prisma_from_records
 
 if __name__ == "__main__":
 
-    plot_prisma_from_records(
-        # records_path="/home/gerit/ownCloud/action-office/LRDM/py-prisma/demo/data/records.bib",
-        # output_path="export_test.png"
-    )
-
     # ============================================================
     # NEW SYSTEMATIC REVIEW
     # ============================================================
@@ -207,3 +202,9 @@ if __name__ == "__main__":
 
     # TODO: try previous=.. with included=... or
     # not previous with new_included=... (test whether it throws errors)
+
+
+    plot_prisma_from_records(
+        # records_path="/home/gerit/ownCloud/action-office/LRDM/py-prisma/demo/data/records.bib",
+        # output_path="export_test.png"
+    )
