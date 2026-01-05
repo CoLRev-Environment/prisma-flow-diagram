@@ -1,8 +1,11 @@
-from py_prisma import plot_prisma2020_new
+from prisma_flow_diagram import plot_prisma2020_new
 
 plot_prisma2020_new(
     db_registers={
-        "identification": {"databases": {"Web of Science": 20, "Pubmed": 43}, "registers": 10},
+        "identification": {
+            "databases": {"Web of Science": 20, "Pubmed": 43},
+            "registers": 10,
+        },
         "removed_before_screening": {"duplicates": 30, "automation": 5},
         "records": {"screened": 95, "excluded": 55},
         "reports": {

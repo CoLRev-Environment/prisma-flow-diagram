@@ -1,7 +1,7 @@
-# PRISMA-Py: A Python Package for PRISMA 2020 Flow Charts
+# prisma-flow-diagram: A Python Package for PRISMA Flow Diagrams
 
 This packages creates PRISMA 2020--style flow diagrams using matplotlib.
-You provide counts for each step of your screening process, and it generates a PRISMA 2020 flow chart.
+You provide counts for each step of your screening process, and it generates a PRISMA 2020 flow diagrams.
 The design goal is a **small, transparent interface** with sensible defaults and layout that adapts to your data.
 
 It supports:
@@ -15,15 +15,15 @@ You can either:
 - pass structured counts programmatically, or
 - derive counts automatically from a CoLRev `records.bib` file.
 
-Upon generating the flow chart, the input is validated and warnings are printed when the review is incomplete or when values are inconsistent.
+Upon generating the flow diagram, the input is validated and warnings are printed when the review is incomplete or when values are inconsistent.
 
 > **Validation that prevents common errors.**
 >
 > PRISMA-Py checks your counts for internal consistency *before* drawing the diagram.
 > Example checks:
 >
-> - screened ≤ identified − removed_before_screening  
-> - excluded ≤ screened  
+> - screened ≤ identified − removed_before_screening
+> - excluded ≤ screened
 > - sought = assessed + not_retrieved
 >
 > By default you will get readable warnings; you can also configure validation to raise errors in CI.
@@ -66,7 +66,7 @@ def plot_prisma2020_updated(
 ) -> None:
 ```
 
-Note: 
+Note:
 
 - `db_registers.identification.databases` can be a total or detailed breakdown (dictionary).
 - `db_registers.identification.registers` is optional.

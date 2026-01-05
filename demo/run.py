@@ -1,5 +1,5 @@
-from py_prisma import plot_prisma2020_new, plot_prisma2020_updated
-from py_prisma import plot_prisma_from_records
+from prisma_flow_diagram import plot_prisma2020_new, plot_prisma2020_updated
+from prisma_flow_diagram import plot_prisma_from_records
 from pathlib import Path
 
 if __name__ == "__main__":
@@ -70,9 +70,9 @@ if __name__ == "__main__":
         included={"studies": 40, "reports": 56},
         other_methods={
             "identification": {
-                    "Websites": 22,
-                    "Organisations": 15,
-                    "Citation searching": 41,
+                "Websites": 22,
+                "Organisations": 15,
+                "Citation searching": 41,
             },
             "removed_before_screening": {"duplicates": 0, "automation": 0, "other": 0},
             "records": {"screened": 78, "excluded": 60},
@@ -187,9 +187,9 @@ if __name__ == "__main__":
         },
         other_methods={
             "identification": {
-                    "Websites": 10,
-                    "Organisations": 8,
-                    "Citation searching": 27,
+                "Websites": 10,
+                "Organisations": 8,
+                "Citation searching": 27,
             },
             "removed_before_screening": {"duplicates": 0, "automation": 0, "other": 0},
             "records": {"screened": 45, "excluded": 35},
@@ -210,22 +210,18 @@ if __name__ == "__main__":
 
     print("\n---------------------------------------------------")
     print("colrev_new.png")
-    plot_prisma_from_records(
-        output_path="colrev_new.png"
-    )
+    plot_prisma_from_records(output_path="colrev_new.png")
 
     print("\n---------------------------------------------------")
     print("colrev_new_other-methods.png")
     plot_prisma_from_records(
-        other_methods=["Fiers2023.csv"],
-        output_path="colrev_new_other-methods.png"
+        other_methods=["Fiers2023.csv"], output_path="colrev_new_other-methods.png"
     )
 
     print("\n---------------------------------------------------")
     print("colrev_updated.png")
     plot_prisma_from_records(
-        prior_reviews=["WagnerPresterPare2021.bib"],
-        output_path="colrev_updated.png"
+        prior_reviews=["WagnerPresterPare2021.bib"], output_path="colrev_updated.png"
     )
 
     print("\n---------------------------------------------------")
@@ -233,15 +229,13 @@ if __name__ == "__main__":
     plot_prisma_from_records(
         prior_reviews=["WagnerPresterPare2021.bib"],
         other_methods=["Fiers2023.csv"],
-        output_path="colrev_updated_other-methods.png"
+        output_path="colrev_updated_other-methods.png",
     )
 
     # TODO: try previous=.. with included=... or
     # not previous with new_included=... (test whether it throws errors)
 
-
-
-    print('\n\n\nValidation errors --------------------------------------')
+    print("\n\n\nValidation errors --------------------------------------")
 
     # ============================================================
     # EXAMPLE 1 — NEW review (intentionally broken)
@@ -304,19 +298,19 @@ if __name__ == "__main__":
                 "registers": 0,
             },
             "removed_before_screening": {
-                "duplicates": 6,   # removed (6) > identified (5) -> ERROR
+                "duplicates": 6,  # removed (6) > identified (5) -> ERROR
                 "automation": 0,
                 "other": 0,
             },
             "records": {
-                "screened": 10,    # screened > (identified - removed) => 10 > (5-6=-1) won't trigger;
-                                  # but we still keep it to show "screened weirdness" in the printed context
-                "excluded": 20,    # excluded > screened -> warning
+                "screened": 10,  # screened > (identified - removed) => 10 > (5-6=-1) won't trigger;
+                # but we still keep it to show "screened weirdness" in the printed context
+                "excluded": 20,  # excluded > screened -> warning
             },
             "reports": {
                 "sought": 3,
                 "not_retrieved": 4,  # > sought -> warning
-                "assessed": 5,       # > sought -> warning
+                "assessed": 5,  # > sought -> warning
                 # assessed + not_retrieved != sought -> warning
             },
         },
@@ -332,4 +326,3 @@ if __name__ == "__main__":
         filename="bad_updated_all.png",
     )
     Path("bad_updated_all.png").unlink()
-

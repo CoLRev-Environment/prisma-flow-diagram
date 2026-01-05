@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Literal, Mapping, Optional
-from collections.abc import Mapping  # add near imports (runtime Mapping)
-
+from typing import Any, Mapping, Optional
+from typing_extensions import Literal
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 
@@ -186,7 +185,9 @@ class MatplotlibRenderer:
         )
         return g
 
-    def draw_arrow(self, xy_from: tuple[float, float], xy_to: tuple[float, float]) -> None:
+    def draw_arrow(
+        self, xy_from: tuple[float, float], xy_to: tuple[float, float]
+    ) -> None:
         self.ax.annotate(
             "",
             xy=xy_to,
@@ -307,15 +308,37 @@ class Prisma2020Diagram:
     ):
         self.style = style or PrismaStyle()
 
-        # NEW
-        self.db_registers = dict(db_registers) if db_registers is not None else None
-        self.included = dict(included) if included is not None else None
-        self.other_methods = dict(other_methods) if other_methods is not None else None
+        # # NEW
+        # self.db_registers = dict(db_registers) if db_registers is not None else None
+        # self.included = dict(included) if included is not None else None
+        # self.other_methods = dict(other_methods) if other_methods is not None else None
 
-        # UPDATED
-        self.previous = dict(previous) if previous is not None else None
-        self.new_db_registers = dict(new_db_registers) if new_db_registers is not None else None
-        self.new_included = dict(new_included) if new_included is not None else None
+        # # UPDATED
+        # self.previous = dict(previous) if previous is not None else None
+        # self.new_db_registers = (
+        #     dict(new_db_registers) if new_db_registers is not None else None
+        # )
+        # self.new_included = dict(new_included) if new_included is not None else None
+
+        self.db_registers: Optional[Mapping[str, Any]] = (
+            dict(db_registers) if db_registers is not None else None
+        )
+        self.included: Optional[Mapping[str, Any]] = (
+            dict(included) if included is not None else None
+        )
+        self.other_methods: Optional[Mapping[str, Any]] = (
+            dict(other_methods) if other_methods is not None else None
+        )
+
+        self.previous: Optional[Mapping[str, Any]] = (
+            dict(previous) if previous is not None else None
+        )
+        self.new_db_registers: Optional[Mapping[str, Any]] = (
+            dict(new_db_registers) if new_db_registers is not None else None
+        )
+        self.new_included: Optional[Mapping[str, Any]] = (
+            dict(new_included) if new_included is not None else None
+        )
 
         self.is_updated = (
             self.previous is not None
@@ -500,8 +523,6 @@ class Prisma2020Diagram:
             ),
         }
 
-
-
     def _other_left_text(self) -> dict[str, str]:
         assert self.other_methods is not None
 
@@ -542,7 +563,6 @@ class Prisma2020Diagram:
             ASSESSED: f"Reports assessed for eligibility\n(n = {self._get(reports, 'assessed', 0)})",
         }
 
-
     def _other_right_text(self) -> dict[str, str]:
         assert self.other_methods is not None
 
@@ -559,7 +579,6 @@ class Prisma2020Diagram:
             ),
         }
 
-
     @staticmethod
     def _fmt_included_block(
         *,
@@ -570,14 +589,16 @@ class Prisma2020Diagram:
     ) -> str:
         if n_reports is None:
             return f"{label_studies}\n(n = {n_studies})"
-        return (
-            f"{label_studies}\n(n = {n_studies})\n{label_reports}\n(n = {n_reports})"
-        )
+        return f"{label_studies}\n(n = {n_studies})\n{label_reports}\n(n = {n_reports})"
 
     def _included_new_review_text(self) -> str:
         assert self.included is not None
         studies = int(self._get(self.included, "studies", 0))
-        reports = int(self._get(self.included, "reports", 0)) if "reports" in self.included else None
+        reports = (
+            int(self._get(self.included, "reports", 0))
+            if "reports" in self.included
+            else None
+        )
         return self._fmt_included_block(
             label_studies="Studies included in review",
             n_studies=studies,
@@ -591,10 +612,16 @@ class Prisma2020Diagram:
         # Expect: previous={"included": {"studies": ..., "reports": ...}}
         prev_inc = dict(self.previous.get("included", {}))
         prev_studies = int(self._get(prev_inc, "studies", 0))
-        prev_reports = int(self._get(prev_inc, "reports", 0)) if "reports" in prev_inc else None
+        prev_reports = (
+            int(self._get(prev_inc, "reports", 0)) if "reports" in prev_inc else None
+        )
 
         new_studies = int(self._get(self.new_included, "studies", 0))
-        new_reports = int(self._get(self.new_included, "reports", 0)) if "reports" in self.new_included else None
+        new_reports = (
+            int(self._get(self.new_included, "reports", 0))
+            if "reports" in self.new_included
+            else None
+        )
 
         total_studies = prev_studies + new_studies
         if prev_reports is None and new_reports is None:
@@ -822,7 +849,9 @@ class Prisma2020Diagram:
     # Drawing: headers / lanes / included / labels
     # ------------------------------------------------------------------------
 
-    def _draw_headers(self, renderer: MatplotlibRenderer, layout: Layout, *, has_other: bool) -> None:
+    def _draw_headers(
+        self, renderer: MatplotlibRenderer, layout: Layout, *, has_other: bool
+    ) -> None:
         style = self.style
 
         hdr_main_text = (
@@ -991,7 +1020,10 @@ class Prisma2020Diagram:
         )
 
         renderer.draw_arrow(
-            (lanes.main[ASSESSED].center_x, lanes.main[ASSESSED].bottom - style.arrow_margin),
+            (
+                lanes.main[ASSESSED].center_x,
+                lanes.main[ASSESSED].bottom - style.arrow_margin,
+            ),
             (inc_geom.center_x, inc_geom.top + style.arrow_margin),
         )
 
@@ -1021,26 +1053,53 @@ class Prisma2020Diagram:
         new_h = self.calc_box_height(new_text)
         new_y = self._lowest_assessed_bottom(lanes) - style.v_gap - new_h / 2
         new_geom = renderer.draw_box(
-            Box("new_included", new_text, layout.x_main_left, new_y, widths.w_included, new_h, align="left")
+            Box(
+                "new_included",
+                new_text,
+                layout.x_main_left,
+                new_y,
+                widths.w_included,
+                new_h,
+                align="left",
+            )
         )
 
         # total included (below new)
         total_h = self.calc_box_height(total_text)
         total_y = new_geom.bottom - style.v_gap - total_h / 2
         total_geom = renderer.draw_box(
-            Box("total_included", total_text, layout.x_main_left, total_y, widths.w_included, total_h, align="left")
+            Box(
+                "total_included",
+                total_text,
+                layout.x_main_left,
+                total_y,
+                widths.w_included,
+                total_h,
+                align="left",
+            )
         )
 
         # previous included (lane at top aligned with main identification)
         prev_h = self.calc_box_height(prev_text)
         prev_y = lanes.main[IDENT].center_y
         prev_geom = renderer.draw_box(
-            Box("previous", prev_text, layout.x_prev_center, prev_y, widths.w_included, prev_h, align="left")
+            Box(
+                "previous",
+                prev_text,
+                layout.x_prev_center,
+                prev_y,
+                widths.w_included,
+                prev_h,
+                align="left",
+            )
         )
 
         # connectors
         renderer.draw_arrow(
-            (lanes.main[ASSESSED].center_x, lanes.main[ASSESSED].bottom - style.arrow_margin),
+            (
+                lanes.main[ASSESSED].center_x,
+                lanes.main[ASSESSED].bottom - style.arrow_margin,
+            ),
             (new_geom.center_x, new_geom.top + style.arrow_margin),
         )
 
@@ -1054,13 +1113,17 @@ class Prisma2020Diagram:
             (total_geom.center_x, total_geom.top + style.arrow_margin),
         )
 
-        self._draw_prev_to_total_routed(renderer=renderer, prev_geom=prev_geom, total_geom=total_geom)
+        self._draw_prev_to_total_routed(
+            renderer=renderer, prev_geom=prev_geom, total_geom=total_geom
+        )
 
         # ensure bottom is included
         desired_ymin = min(style.ylim[0], total_geom.bottom - style.bottom_padding)
         renderer.ax.set_ylim(desired_ymin, style.ylim[1])
 
-        return IncludedGeometries(included=None, prev=prev_geom, new=new_geom, total=total_geom)
+        return IncludedGeometries(
+            included=None, prev=prev_geom, new=new_geom, total=total_geom
+        )
 
     def _draw_included(
         self,
@@ -1073,7 +1136,11 @@ class Prisma2020Diagram:
     ) -> IncludedGeometries:
         if self.is_updated:
             return self._draw_included_updated(
-                renderer=renderer, layout=layout, widths=widths, texts=texts, lanes=lanes
+                renderer=renderer,
+                layout=layout,
+                widths=widths,
+                texts=texts,
+                lanes=lanes,
             )
         return self._draw_included_new(
             renderer=renderer, layout=layout, widths=widths, texts=texts, lanes=lanes
@@ -1088,10 +1155,14 @@ class Prisma2020Diagram:
     ) -> None:
         style = self.style
 
-        id_center, id_height = self.phase_span([lanes.main[IDENT]], min_height=style.ident_phase_min_height)
+        id_center, id_height = self.phase_span(
+            [lanes.main[IDENT]], min_height=style.ident_phase_min_height
+        )
         renderer.draw_phase_label(style.phase_x, id_center, id_height, "Identification")
 
-        scr_center, scr_height = self.phase_span([lanes.main[SCREENED], lanes.main[SOUGHT], lanes.main[ASSESSED]])
+        scr_center, scr_height = self.phase_span(
+            [lanes.main[SCREENED], lanes.main[SOUGHT], lanes.main[ASSESSED]]
+        )
         renderer.draw_phase_label(style.phase_x, scr_center, scr_height, "Screening")
 
         if included.included is not None:
@@ -1124,11 +1195,17 @@ class Prisma2020Diagram:
         widths = self._compute_widths(texts)
         layout = self._compute_layout(widths, has_other=has_other)
 
-        renderer = MatplotlibRenderer(figsize=figsize, style=self.style, xlim=layout.xlim)
+        renderer = MatplotlibRenderer(
+            figsize=figsize, style=self.style, xlim=layout.xlim
+        )
 
         self._draw_headers(renderer, layout, has_other=has_other)
-        lanes = self._draw_lanes(renderer=renderer, layout=layout, widths=widths, texts=texts)
-        included = self._draw_included(renderer=renderer, layout=layout, widths=widths, texts=texts, lanes=lanes)
+        lanes = self._draw_lanes(
+            renderer=renderer, layout=layout, widths=widths, texts=texts
+        )
+        included = self._draw_included(
+            renderer=renderer, layout=layout, widths=widths, texts=texts, lanes=lanes
+        )
         self._draw_phase_labels(renderer=renderer, lanes=lanes, included=included)
 
         if filename is not None:
@@ -1203,10 +1280,10 @@ def plot_prisma2020_updated(
 # Fallback validation (only used if .validation module isn't available)
 # ============================================================================
 
+
 @dataclass(frozen=True)
 class ValidationIssue:
     severity: Literal["warning", "error"]
     code: str
     message: str
     path: str | None = None
-

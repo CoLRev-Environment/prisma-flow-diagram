@@ -1,10 +1,10 @@
-# validation.py
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Literal, Optional, Protocol
+from typing import Any, Optional, Mapping
+from typing_extensions import Literal, Protocol
 
-from collections.abc import Mapping  # IMPORTANT: runtime-checkable Mapping
+# flake8: noqa
 
 # -----------------------------------------------------------------------------
 # Public types
@@ -36,6 +36,7 @@ class _DiagramLike(Protocol):
 # -----------------------------------------------------------------------------
 # Helpers
 # -----------------------------------------------------------------------------
+
 
 def _as_int_maybe(x: Any) -> Optional[int]:
     if x is None:
@@ -93,7 +94,9 @@ def _lane(diagram: _DiagramLike) -> Optional[Mapping[str, Any]]:
     return diagram.new_db_registers if diagram.is_updated else diagram.db_registers
 
 
-def _mk(severity: Severity, code: str, message: str, path: str | None = None) -> ValidationIssue:
+def _mk(
+    severity: Severity, code: str, message: str, path: str | None = None
+) -> ValidationIssue:
     return ValidationIssue(severity=severity, code=code, message=message, path=path)
 
 
@@ -291,7 +294,9 @@ def _human_issue(issue: ValidationIssue) -> tuple[str, str]:
             ),
         )
 
-    if issue.code.startswith("other_methods.missing.identification") or issue.code.startswith("other_methods.invalid.identification"):
+    if issue.code.startswith(
+        "other_methods.missing.identification"
+    ) or issue.code.startswith("other_methods.invalid.identification"):
         title = f"{title_prefix}Other-methods identification incomplete"
         return (
             title,
@@ -302,7 +307,9 @@ def _human_issue(issue: ValidationIssue) -> tuple[str, str]:
             ),
         )
 
-    if issue.code.startswith("other_methods.missing.reports") or issue.code.startswith("other_methods.invalid.reports"):
+    if issue.code.startswith("other_methods.missing.reports") or issue.code.startswith(
+        "other_methods.invalid.reports"
+    ):
         title = f"{title_prefix}Other-methods reports incomplete"
         return (
             title,
@@ -350,6 +357,7 @@ def _human_issue(issue: ValidationIssue) -> tuple[str, str]:
 # -----------------------------------------------------------------------------
 # Lane validation (shared by main lane and other_methods lane)
 # -----------------------------------------------------------------------------
+
 
 def _validate_lane(
     *,
@@ -399,18 +407,43 @@ def _validate_lane(
         ("assessed", assessed, f"{prefix}.reports.assessed"),
     ]:
         if _neg(val):
-            issues.append(_mk("error", "negative.count", f"{name} must be >= 0 (got {val}).", path))
+            issues.append(
+                _mk(
+                    "error", "negative.count", f"{name} must be >= 0 (got {val}).", path
+                )
+            )
 
     if check_identification and _neg(identified):
-        issues.append(_mk("error", "negative.count", f"identified must be >= 0 (got {identified}).", f"{prefix}.identification"))
+        issues.append(
+            _mk(
+                "error",
+                "negative.count",
+                f"identified must be >= 0 (got {identified}).",
+                f"{prefix}.identification",
+            )
+        )
 
     # Hard consistency (errors)
     if check_identification and identified is not None and removed_sum > identified:
-        issues.append(_mk("error", "inconsistent.removed_gt_identified", f"Identified: {identified}. Removed before screening: {removed_sum}.", f"{prefix}.removed_before_screening"))
+        issues.append(
+            _mk(
+                "error",
+                "inconsistent.removed_gt_identified",
+                f"Identified: {identified}. Removed before screening: {removed_sum}.",
+                f"{prefix}.removed_before_screening",
+            )
+        )
 
     # Plausibility (warnings)
     if screened is None:
-        issues.append(_mk("warning", "missing.records.screened", "records.screened is missing.", f"{prefix}.records.screened"))
+        issues.append(
+            _mk(
+                "warning",
+                "missing.records.screened",
+                "records.screened is missing.",
+                f"{prefix}.records.screened",
+            )
+        )
 
     if check_identification and identified is not None and screened is not None:
         remaining = identified - removed_sum
@@ -424,49 +457,137 @@ def _validate_lane(
                 )
             )
 
-    if screened is not None and excluded_records is not None and excluded_records > screened:
-        issues.append(_mk("warning", "suspicious.excluded_gt_screened", f"Screened: {screened}. Excluded: {excluded_records}.", f"{prefix}.records.excluded"))
+    if (
+        screened is not None
+        and excluded_records is not None
+        and excluded_records > screened
+    ):
+        issues.append(
+            _mk(
+                "warning",
+                "suspicious.excluded_gt_screened",
+                f"Screened: {screened}. Excluded: {excluded_records}.",
+                f"{prefix}.records.excluded",
+            )
+        )
 
     if sought is None:
-        issues.append(_mk("warning", "missing.reports.sought", "reports.sought is missing.", f"{prefix}.reports.sought"))
+        issues.append(
+            _mk(
+                "warning",
+                "missing.reports.sought",
+                "reports.sought is missing.",
+                f"{prefix}.reports.sought",
+            )
+        )
     else:
         if not_retrieved is not None and not_retrieved > sought:
-            issues.append(_mk("warning", "suspicious.not_retrieved_gt_sought", f"Sought: {sought}. Not retrieved: {not_retrieved}.", f"{prefix}.reports.not_retrieved"))
+            issues.append(
+                _mk(
+                    "warning",
+                    "suspicious.not_retrieved_gt_sought",
+                    f"Sought: {sought}. Not retrieved: {not_retrieved}.",
+                    f"{prefix}.reports.not_retrieved",
+                )
+            )
         if assessed is not None and assessed > sought:
-            issues.append(_mk("warning", "suspicious.assessed_gt_sought", f"Sought: {sought}. Assessed: {assessed}.", f"{prefix}.reports.assessed"))
-        if assessed is not None and not_retrieved is not None and assessed + not_retrieved != sought:
-            issues.append(_mk("warning", "suspicious.sought_split_mismatch", f"Sought: {sought}. Assessed: {assessed}. Not retrieved: {not_retrieved}. Assessed + Not retrieved = {assessed + not_retrieved}.", f"{prefix}.reports"))
+            issues.append(
+                _mk(
+                    "warning",
+                    "suspicious.assessed_gt_sought",
+                    f"Sought: {sought}. Assessed: {assessed}.",
+                    f"{prefix}.reports.assessed",
+                )
+            )
+        if (
+            assessed is not None
+            and not_retrieved is not None
+            and assessed + not_retrieved != sought
+        ):
+            issues.append(
+                _mk(
+                    "warning",
+                    "suspicious.sought_split_mismatch",
+                    f"Sought: {sought}. Assessed: {assessed}. Not retrieved: {not_retrieved}. Assessed + Not retrieved = {assessed + not_retrieved}.",
+                    f"{prefix}.reports",
+                )
+            )
 
 
 # -----------------------------------------------------------------------------
 # Public API
 # -----------------------------------------------------------------------------
 
+
 def validate_diagram(diagram: _DiagramLike) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
 
     lane = _lane(diagram)
     if lane is None:
-        issues.append(_mk("error", "missing.lane", "Missing db/registers lane block.", "db_registers/new_db_registers"))
+        issues.append(
+            _mk(
+                "error",
+                "missing.lane",
+                "Missing db/registers lane block.",
+                "db_registers/new_db_registers",
+            )
+        )
         return issues
 
     # Required blocks (mode-specific)
     if diagram.is_updated:
         if diagram.previous is None:
-            issues.append(_mk("error", "missing.previous", "Updated review requires previous=...", "previous"))
+            issues.append(
+                _mk(
+                    "error",
+                    "missing.previous",
+                    "Updated review requires previous=...",
+                    "previous",
+                )
+            )
         if diagram.new_included is None:
-            issues.append(_mk("error", "missing.new_included", "Updated review requires new_included=...", "new_included"))
+            issues.append(
+                _mk(
+                    "error",
+                    "missing.new_included",
+                    "Updated review requires new_included=...",
+                    "new_included",
+                )
+            )
         if diagram.new_db_registers is None:
-            issues.append(_mk("error", "missing.new_db_registers", "Updated review requires new_db_registers=...", "new_db_registers"))
+            issues.append(
+                _mk(
+                    "error",
+                    "missing.new_db_registers",
+                    "Updated review requires new_db_registers=...",
+                    "new_db_registers",
+                )
+            )
     else:
         if diagram.included is None:
-            issues.append(_mk("error", "missing.included", "New review requires included=...", "included"))
+            issues.append(
+                _mk(
+                    "error",
+                    "missing.included",
+                    "New review requires included=...",
+                    "included",
+                )
+            )
         if diagram.db_registers is None:
-            issues.append(_mk("error", "missing.db_registers", "New review requires db_registers=...", "db_registers"))
+            issues.append(
+                _mk(
+                    "error",
+                    "missing.db_registers",
+                    "New review requires db_registers=...",
+                    "db_registers",
+                )
+            )
 
     # Main lane
     main_prefix = "new_db_registers" if diagram.is_updated else "db_registers"
-    _validate_lane(lane=lane, issues=issues, prefix=main_prefix, check_identification=True)
+    _validate_lane(
+        lane=lane, issues=issues, prefix=main_prefix, check_identification=True
+    )
 
     # Included plausibility
     if diagram.is_updated:
@@ -484,39 +605,98 @@ def validate_diagram(diagram: _DiagramLike) -> list[ValidationIssue]:
         ("included_reports", included_reports, f"{inc_prefix}.reports"),
     ]:
         if _neg(val):
-            issues.append(_mk("error", "negative.count", f"{name} must be >= 0 (got {val}).", path))
+            issues.append(
+                _mk(
+                    "error", "negative.count", f"{name} must be >= 0 (got {val}).", path
+                )
+            )
 
     assessed_main = _as_int_maybe(_get_path(lane, "reports", "assessed"))
-    if assessed_main is not None and included_reports is not None and included_reports > assessed_main:
-        issues.append(_mk("warning", "suspicious.included_reports_gt_assessed", f"Assessed: {assessed_main}. Included reports: {included_reports}.", f"{inc_prefix}.reports"))
+    if (
+        assessed_main is not None
+        and included_reports is not None
+        and included_reports > assessed_main
+    ):
+        issues.append(
+            _mk(
+                "warning",
+                "suspicious.included_reports_gt_assessed",
+                f"Assessed: {assessed_main}. Included reports: {included_reports}.",
+                f"{inc_prefix}.reports",
+            )
+        )
 
     if _get_path(lane, "identification") is None:
-        issues.append(_mk("warning", "missing.identification", "identification block is missing.", f"{main_prefix}.identification"))
+        issues.append(
+            _mk(
+                "warning",
+                "missing.identification",
+                "identification block is missing.",
+                f"{main_prefix}.identification",
+            )
+        )
 
     # other_methods
     if diagram.other_methods is not None:
         om = diagram.other_methods
 
-        has_lane_bits = isinstance(_get_path(om, "records"), Mapping) or isinstance(_get_path(om, "reports"), Mapping)
+        has_lane_bits = isinstance(_get_path(om, "records"), Mapping) or isinstance(
+            _get_path(om, "reports"), Mapping
+        )
         if has_lane_bits:
-            _validate_lane(lane=om, issues=issues, prefix="other_methods", check_identification=False)
+            _validate_lane(
+                lane=om,
+                issues=issues,
+                prefix="other_methods",
+                check_identification=False,
+            )
 
         ident = _get_path(om, "identification")
         if ident is None:
-            issues.append(_mk("warning", "other_methods.missing.identification", "other_methods.identification is missing.", "other_methods.identification"))
+            issues.append(
+                _mk(
+                    "warning",
+                    "other_methods.missing.identification",
+                    "other_methods.identification is missing.",
+                    "other_methods.identification",
+                )
+            )
         elif not isinstance(ident, Mapping):
-            issues.append(_mk("warning", "other_methods.invalid.identification", "other_methods.identification is not a mapping.", "other_methods.identification"))
+            issues.append(
+                _mk(
+                    "warning",
+                    "other_methods.invalid.identification",
+                    "other_methods.identification is not a mapping.",
+                    "other_methods.identification",
+                )
+            )
 
         rep = _get_path(om, "reports")
         if rep is None:
-            issues.append(_mk("warning", "other_methods.missing.reports", "other_methods.reports is missing.", "other_methods.reports"))
+            issues.append(
+                _mk(
+                    "warning",
+                    "other_methods.missing.reports",
+                    "other_methods.reports is missing.",
+                    "other_methods.reports",
+                )
+            )
         elif not isinstance(rep, Mapping):
-            issues.append(_mk("warning", "other_methods.invalid.reports", "other_methods.reports is not a mapping.", "other_methods.reports"))
+            issues.append(
+                _mk(
+                    "warning",
+                    "other_methods.invalid.reports",
+                    "other_methods.reports is not a mapping.",
+                    "other_methods.reports",
+                )
+            )
 
     return issues
 
 
-def handle_validation(issues: list[ValidationIssue], *, mode: ValidationMode = "warn") -> None:
+def handle_validation(
+    issues: list[ValidationIssue], *, mode: ValidationMode = "warn"
+) -> None:
     if mode == "off" or not issues:
         return
 
@@ -530,7 +710,11 @@ def handle_validation(issues: list[ValidationIssue], *, mode: ValidationMode = "
     if mode == "warn" and (errors or warnings):
         out: list[str] = []
         if errors:
-            out.append(_format_issues(errors, title="PRISMA validation errors (plotting continues)"))
+            out.append(
+                _format_issues(
+                    errors, title="PRISMA validation errors (plotting continues)"
+                )
+            )
         if warnings:
             out.append(_format_issues(warnings, title="PRISMA validation warnings"))
         print("\n\n".join(out))

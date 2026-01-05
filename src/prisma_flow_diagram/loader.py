@@ -185,7 +185,9 @@ def _split_origin(value: Any) -> list[str]:
     return []
 
 
-def _has_any_origin_prefix(rec: Mapping[str, Any], *, origin_field: str, prefixes: list[str]) -> bool:
+def _has_any_origin_prefix(
+    rec: Mapping[str, Any], *, origin_field: str, prefixes: list[str]
+) -> bool:
     if not prefixes:
         return False
     parts = _split_origin(rec.get(origin_field))
@@ -404,7 +406,9 @@ def _status_to_db_registers_mapping(status: PrismaStatus) -> Optional[Dict[str, 
 
 
 def _status_to_included_mapping(status: PrismaStatus) -> Optional[Dict[str, Any]]:
-    return _prune_none({"studies": status.included, "reports": status.new_reports}) or None
+    return (
+        _prune_none({"studies": status.included, "reports": status.new_reports}) or None
+    )
 
 
 def _other_methods_mapping(count: int) -> Optional[Dict[str, Any]]:
@@ -446,7 +450,9 @@ def load_status_from_records(
     # If no prefix logic requested: behave like a plain "new review" loader
     if not prior_reviews and not other_methods:
         status_all = records_to_status(records)
-        n_origins, dup_removed = compute_origin_stats(records, origin_field=origin_field)
+        n_origins, dup_removed = compute_origin_stats(
+            records, origin_field=origin_field
+        )
         status_all = PrismaStatus(
             **{**asdict(status_all), "databases": n_origins, "duplicates": dup_removed}
         )
@@ -478,7 +484,9 @@ def load_status_from_records(
     # - databases/registers: derived only from db_recs origins
     # - duplicates removed: derived from all new_pipeline_recs origins
     db_origins, _ = compute_origin_stats(db_recs, origin_field=origin_field)
-    _, dup_removed_new = compute_origin_stats(new_pipeline_recs, origin_field=origin_field)
+    _, dup_removed_new = compute_origin_stats(
+        new_pipeline_recs, origin_field=origin_field
+    )
 
     status_new = PrismaStatus(
         **{
@@ -506,5 +514,3 @@ def load_status_from_records(
         included=_status_to_included_mapping(status_new),
         other_methods=_other_methods_mapping(len(other_method_recs)),
     )
-
-

@@ -53,4 +53,3 @@ def plot_prisma_from_records(
         return
 
     raise TypeError(f"Unexpected params type: {type(params)!r}")
-
