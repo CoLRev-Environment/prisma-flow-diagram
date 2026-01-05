@@ -232,8 +232,8 @@ plot_prisma2020_updated(
     },
     # IMPORTANT: new_included is the TOTAL newly included across all new-lanes
     new_included={
-        "studies": 18 + 4,  # example: 22 new studies total
-        "reports": 23 + 4,  # example: 27 new reports total
+        "studies": 22,
+        "reports":27,
     },
     filename="updated-other-methods.png",
 )
@@ -270,8 +270,7 @@ TODO: document how updated reviews and other search methods are added in the CoL
 ## Validation
 
 The package validates PRISMA 2020 flow data before (and during) plotting
-to catch impossible counts and highlight suspicious inconsistencies
-early.
+to catch inconsistencies.
 
 Validation is designed to be:
 
@@ -282,12 +281,10 @@ Validation is designed to be:
 
 **Example validation message**
 
-``` text
-WARNING: Included exceeds assessed
-In the databases/registers lane, more reports are included than were assessed for eligibility.
-Fix: Reduce included reports or increase reports.assessed if assessed is incomplete.
-Rule: included.reports ≤ db_registers.reports.assessed
-```
+> **WARNING**: Included exceeds assessed
+> In the databases/registers lane, more reports are included than were assessed for eligibility.
+> *Fix*: Reduce included reports or increase reports.assessed if assessed is incomplete.
+> *Rule*: included.reports ≤ db_registers.reports.assessed
 
 ### What is checked
 
