@@ -23,7 +23,7 @@ colrev_doc_link = "README.md"
 search_types = []
 
 [project.entry-points.colrev]
-data = "src.prisma_flow_diagram.colrev:PRISMA"
+data = "prisma_flow_diagram.colrev:PRISMA"
 
 [tool.mypy]
 ignore_missing_imports = true

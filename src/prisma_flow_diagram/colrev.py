@@ -13,6 +13,7 @@ import colrev.env.docker_manager
 import colrev.env.utils
 import colrev.package_manager.package_base_classes as base_classes
 import colrev.package_manager.package_settings
+from prisma_flow_diagram import plot_prisma_from_records
 
 if typing.TYPE_CHECKING:
     import colrev.ops.data
@@ -87,7 +88,7 @@ class PRISMA(base_classes.DataPackageBaseClass):
     ) -> None:
         """Update the data/prisma diagram"""
 
-        # TODO
+        plot_prisma_from_records(output_path="colrev_new.png")
 
     def update_record_status_matrix(
         self,
