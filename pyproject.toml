@@ -2,6 +2,7 @@
 name = "prisma-flow-diagram"
 version = "0.1.0"
 description = "A Python package to create PRISMA flow diagrams"
+readme = "README.md"
 license = {text = "MIT"}
 authors = [
     { name = "Gerit Wagner", email = "gerit.wagner@uni-bamberg.de" }
